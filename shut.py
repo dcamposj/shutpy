@@ -25,10 +25,9 @@ class ShutdownApp:
             if hours <= 0:
                 raise ValueError("El valor debe ser mayor a 0")
             
-            # Crear script PowerShell temporal
             script = f"""$timerHours = {hours}
 $timerSeconds = [math]::Round($timerHours * 3600)
-Write-Host "Dejar esta ventana abierta. La PC se apagará en $timerHours horas..."
+Write-Host "Dejar esta ventana abierta hará que tu PC se apague en $timerHours horas..."
 Start-Sleep -Seconds $timerSeconds
 Stop-Computer -Force"""
             
@@ -37,11 +36,12 @@ Stop-Computer -Force"""
                 f.write(script)
             
             subprocess.Popen([
-                "powershell.exe",
-                "-NoExit",
-                "-ExecutionPolicy", "Bypass",
-                "-File", temp_script_path
-            ], shell=True)
+    "powershell.exe",
+    "-NoExit",
+    "-ExecutionPolicy", "Bypass",
+    "-WindowStyle", "Normal", 
+    "-File", temp_script_path
+], creationflags=subprocess.CREATE_NEW_CONSOLE)
             
             self.root.destroy()
             
