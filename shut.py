@@ -1,13 +1,22 @@
+import os
+import sys
 import subprocess
 import tkinter as tk
 from tkinter import messagebox
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class ShutdownApp:
     def __init__(self, root):
         self.root = root
         root.title("Auto Shutdown")
         root.geometry("680x420")
-        root.iconbitmap("./img/icon.ico")
+        root.iconbitmap(resource_path("icon.ico"))
         root.configure(bg="#23272f")  
 
         font_main = ("Verdana", 18)
@@ -75,7 +84,6 @@ class ShutdownApp:
         self.remaining_seconds = 0
         self.shutdown_scheduled = False
 
-        # Store toggle colors
         self.btn_bg = btn_bg
         self.btn_fg = btn_fg
         self.btn_active_bg = btn_active_bg
@@ -140,4 +148,5 @@ if __name__ == "__main__":
     app = ShutdownApp(root)
     root.mainloop()
 
-# Package: pyinstaller --onefile --windowed --icon=./img/icon.ico shut.py
+# Build with:
+# pyinstaller --onefile --windowed --icon=icon.ico --add-data "icon.ico;." shut.py

@@ -5,7 +5,7 @@ a = Analysis(
     ['shut.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('icon.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['img\\icon.ico'],
+    icon=['icon.ico'],
 )
