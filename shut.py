@@ -123,7 +123,8 @@ class ShutdownApp:
         self.btn_cancel_active_bg = btn_cancel_active_bg
 
         root.protocol("WM_DELETE_WINDOW", self.on_close)
-
+        
+    # new approach if program was terminated
     def on_close(self):
         if self.shutdown_scheduled:
             self.cancel_shutdown()
