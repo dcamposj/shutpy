@@ -32,7 +32,7 @@ class ShutdownApp:
 
         self.label = tk.Label(
             root,
-            text="How many hours to shutdown?\n\nEnter time:",
+            text="Enter time:",
             font=font_label,
             bg="#23272f",
             fg=fg_color
@@ -52,6 +52,38 @@ class ShutdownApp:
         self.entry.insert(0, "1")
         self.entry.pack(pady=5)
         self.entry.focus_set()
+
+        self.time_unit_var = tk.StringVar(value="hours")
+        self.time_unit_frame = tk.Frame(root, bg="#23272f")
+        self.time_unit_frame.pack(pady=10)
+
+        self.hours_radio = tk.Radiobutton(
+            self.time_unit_frame,
+            text="Hours",
+            variable=self.time_unit_var,
+            value="hours",
+            font=font_main,
+            bg="#23272f",
+            fg=fg_color,
+            selectcolor="#678f73",
+            activebackground="#23272f",
+            activeforeground=fg_color
+        )
+        self.hours_radio.pack(side=tk.LEFT, padx=20)
+
+        self.minutes_radio = tk.Radiobutton(
+            self.time_unit_frame,
+            text="Minutes",
+            variable=self.time_unit_var,
+            value="minutes",
+            font=font_main,
+            bg="#23272f",
+            fg=fg_color,
+            selectcolor="#678f73",
+            activebackground="#23272f",
+            activeforeground=fg_color
+        )
+        self.minutes_radio.pack(side=tk.LEFT, padx=20)
 
         button_width = 15
 
@@ -98,23 +130,35 @@ class ShutdownApp:
 
     def schedule_shutdown(self):
         input_text = self.entry.get().replace(',', '.')
+        time_unit = self.time_unit_var.get()
         try:
-            hours = float(input_text)
-            if hours <= 0:
+            value = float(input_text)
+            if value <= 0:
                 raise ValueError("The value must be greater than 0.")
-            elif hours > 500:
-                raise ValueError("This value must be lower than 500.")
-            self.remaining_seconds = int(hours * 3600)
+            
+            if time_unit == "hours":
+                if value > 500:
+                    raise ValueError("This value must be lower than 500.")
+                self.remaining_seconds = int(value * 3600)
+                time_str = f"{value} hours"
+            else:  # minutes
+                if value > 30000:
+                    raise ValueError("This value must be lower than 30000.")
+                self.remaining_seconds = int(value * 60)
+                time_str = f"{value} minutes"
+            
             subprocess.Popen(["shutdown", "/s", "/t", str(self.remaining_seconds)])
             self.shutdown_scheduled = True
             self.entry.config(state=tk.DISABLED)
+            self.hours_radio.config(state=tk.DISABLED)
+            self.minutes_radio.config(state=tk.DISABLED)
             self.update_countdown()
             self.toggle_button.config(
                 text="Cancel",
                 bg=self.btn_cancel_bg,
                 activebackground=self.btn_cancel_active_bg
             )
-            messagebox.showinfo("Done.", f"Shutdown will happen in {hours} hours.")
+            messagebox.showinfo("Done.", f"Shutdown will happen in {time_str}.")
         except ValueError as e:
             messagebox.showerror("Invalid entry.", "Please add a valid value.\n" + str(e))
 
@@ -136,6 +180,8 @@ class ShutdownApp:
         self.shutdown_scheduled = False
         self.countdown_label.config(text="Shutdown cancelled.")
         self.entry.config(state=tk.NORMAL)
+        self.hours_radio.config(state=tk.NORMAL)
+        self.minutes_radio.config(state=tk.NORMAL)
         self.toggle_button.config(
             text="Start Again",
             bg=self.btn_bg,
